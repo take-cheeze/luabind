@@ -21,6 +21,7 @@
 // OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include <luabind/detail/has_get_pointer.hpp>
+#include <luabind/luabind.hpp>
 #include <boost/mpl/assert.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/get_pointer.hpp>
@@ -60,3 +61,4 @@ BOOST_MPL_ASSERT_NOT(( lb::has_get_pointer<int> ));
 BOOST_MPL_ASSERT_NOT(( lb::has_get_pointer<test::X> ));
 BOOST_MPL_ASSERT(( lb::has_get_pointer<test::Z*> ));
 
+void test_main(lua_State*) {}

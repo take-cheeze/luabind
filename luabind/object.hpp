@@ -210,11 +210,11 @@ namespace adl
       detail::stack_pop pop2(L, 1); \
       detail::push(L, rhs); \
 \
-      return fn(L, -1, -2) != 0; \
+      return lua_compare(L, -1, -2, fn) != 0; \
   }
 
-LUABIND_BINARY_OP_DEF(==, lua_equal)
-LUABIND_BINARY_OP_DEF(<, lua_lessthan)
+LUABIND_BINARY_OP_DEF(==, LUA_OPEQ)
+LUABIND_BINARY_OP_DEF(<, LUA_OPLT)
 
   template<class ValueWrapper>
   std::ostream& operator<<(std::ostream& os
@@ -227,7 +227,7 @@ LUABIND_BINARY_OP_DEF(<, lua_lessthan)
       value_wrapper_traits<ValueWrapper>::unwrap(interpreter
         , static_cast<ValueWrapper const&>(v));
 		char const* p = lua_tostring(interpreter, -1);
-        std::size_t len = lua_strlen(interpreter, -1);
+        std::size_t len = lua_rawlen(interpreter, -1);
 		std::copy(p, p + len, std::ostream_iterator<char>(os));
 		return os;
 	}
@@ -540,7 +540,7 @@ namespace detail
           detail::stack_pop pop(m_interpreter, 2);
           m_key.push(m_interpreter);
           other.m_key.push(m_interpreter);
-          return lua_equal(m_interpreter, -2, -1) != 0;
+          return lua_compare(m_interpreter, -2, -1, LUA_OPEQ) != 0;
       }
 
       adl::iterator_proxy<AccessPolicy> dereference() const 
@@ -1093,7 +1093,7 @@ namespace detail
       }
 
       template <class Args, class Policies, class E>
-      static void push_args(lua_State* L, Args const&, Policies const&, E, E)
+      static void push_args(lua_State*, Args const&, Policies const&, E, E)
       {}
 
       template <class... Args, class Policies = null_type>
@@ -1263,7 +1263,7 @@ inline object newtable(lua_State* interpreter)
 // this could be optimized by returning a proxy
 inline object globals(lua_State* interpreter)
 {
-    lua_pushvalue(interpreter, LUA_GLOBALSINDEX);
+    lua_pushglobaltable(interpreter);
     detail::stack_pop pop(interpreter, 1);
     return object(from_stack(interpreter, -1));
 }

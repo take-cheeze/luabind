@@ -55,14 +55,14 @@ struct LUABIND_API invoke_context
     int candidate_index;
 };
 
-template <class F, class... Args, class Policies>
+template <class F, class R, class... Args, class Policies>
 inline int invoke(
     lua_State* L, function_object const& self, invoke_context& ctx
-  , F const& f, vector<Args...>, Policies const& policies)
+  , F const& f, vector<R, Args...>, Policies const& policies)
 {
     return invoke_aux(
-        L, self, ctx, f, policies, vector<Args...>()
-      , typename make_index_tuple<sizeof...(Args) - 1>::type()
+        L, self, ctx, f, policies, vector<R, Args...>()
+      , typename make_index_tuple<Args...>::type()
     );
 }
 
@@ -95,7 +95,7 @@ inline int invoke_aux(
   , F const& f, Policies const& policies
   , vector<R, Args...>, index_tuple<Indices...>)
 {
-    typename make_result_converter<R, Policies>::type result_converter;
+  typename make_result_converter<R, Policies>::type result_converter;
 
     return invoke_actual(
         L, self, ctx, f, policies
@@ -147,7 +147,7 @@ void invoke_function(
 
 template <class F, class... Args>
 void invoke_function(
-    lua_State* L, F const& f, std::false_type, void_result, Args&&... args)
+    lua_State*, F const& f, std::false_type, void_result, Args&&... args)
 {
     f(std::forward<Args>(args)...);
 }
@@ -162,7 +162,7 @@ void invoke_function(
 
 template <class F, class This, class... Args>
 void invoke_function(
-    lua_State* L, F const& f, std::true_type, void_result, This&& this_, Args&&... args)
+    lua_State*, F const& f, std::true_type, void_result, This&& this_, Args&&... args)
 {
     (this_.*f)(std::forward<Args>(args)...);
 }
@@ -196,7 +196,7 @@ template <
 >
 inline int invoke_actual(
     lua_State* L, function_object const& self, invoke_context& ctx
-  , F const& f, Policies const& policies
+  , F const& f, Policies const&
   , vector<R, Args...>, index_tuple<Indices...>
   , ResultConverter& result_converter, Converters&&... converters)
 {
@@ -209,7 +209,7 @@ inline int invoke_actual(
     if (arity == arguments)
     {
         int const scores[] = {
-            compute_score<Args>(L, converters, indices[Indices + 1])...
+            compute_score<Args>(L, converters, indices[Indices + 1])..., 0
         };
 
         score = sum_scores(scores, scores + sizeof...(Args));

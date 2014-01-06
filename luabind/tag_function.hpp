@@ -45,13 +45,14 @@ namespace detail
 
 #  ifdef LUABIND_CPP0x
 
-  template <class... Args, class F, class Policies>
+template <class R, class... Args, class F, class Policies>
   int invoke(
       lua_State* L, function_object const& self, invoke_context& ctx
-    , tagged_function<vector<Args...>, F> const& tagged
-    , vector<Args...>, Policies const& policies)
+      , tagged_function<vector<R, Args...>, F> const& tagged
+      , vector<R, Args...>, Policies const& policies)
   {
-      return invoke(L, self, ctx, tagged.f, vector<Args...>(), policies);
+      return invoke_aux(L, self, ctx, tagged.f, policies, vector<R, Args...>(),
+                        typename make_index_tuple<Args...>::type());
   }
 
   template <class R, class... Args>

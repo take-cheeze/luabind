@@ -374,7 +374,7 @@ typename detail::make_member_proxy<R, Args...>::type call_member(
 
 #endif // LUABIND_CALL_MEMBER_HPP_INCLUDED
 
-#elif BOOST_PP_ITERATION_FLAGS() == 1
+#elif BOOST_PP_IS_ITERATING
 
 #define LUABIND_TUPLE_PARAMS(z, n, data) const A##n *
 #define LUABIND_OPERATOR_PARAMS(z, n, data) const A##n & a##n

@@ -50,7 +50,7 @@ private:
 };
 
 lua_state::lua_state()
-    : m_state(lua_open())
+    : m_state(luaL_newstate())
 {
     luaopen_base(m_state);
 #if defined(LUA_VERSION_NUM) && LUA_VERSION_NUM >= 501
@@ -79,7 +79,7 @@ lua_state::operator lua_State*() const
     return m_state;
 }
 
-int pcall_handler(lua_State* L)
+int pcall_handler(lua_State*)
 {
 	return 1;
 }

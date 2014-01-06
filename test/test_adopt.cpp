@@ -79,25 +79,17 @@ void test_main(lua_State* L)
         "  end\n"
     );
 
-    DOSTRING(L,
-        "x = Derived()\n"
-    );
-
+    DOSTRING(L, "x = Derived()\n");
     TEST_CHECK(Base::count == 2);
 
-    DOSTRING(L,
-        "x = nil\n"
-        "collectgarbage('collect')\n"
-        "collectgarbage('collect')\n"
-    );
+    DOSTRING(L, "x.x = nil\n");
+    lua_gc(L, LUA_GCCOLLECT, 0);
+    lua_gc(L, LUA_GCCOLLECT, 0);
+    TEST_CHECK(Base::count == 1);
 
-    TEST_CHECK(Base::count == 0);
-
-    DOSTRING(L,
-        "x = nil\n"
-        "collectgarbage('collect')\n"
-    );
-
+    DOSTRING(L, "x = nil\n");
+    lua_gc(L, LUA_GCCOLLECT, 0);
+    lua_gc(L, LUA_GCCOLLECT, 0);
     TEST_CHECK(Base::count == 0);
 
      DOSTRING(L,
